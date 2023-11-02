@@ -76,40 +76,28 @@
 networks:
   nextcloud-network:
     external: true
-  traefik-network:
-    external: true
 
 volumes:
   nextcloud-data:
   redis-data:
   nextcloud-postgres:
-  nextcloud-postgres-backup:
-  nextcloud-data-backups:
-  nextcloud-database-backups:
-  traefik-certificates:
 
 services:
   postgres:
-    image: ${NEXTCLOUD_POSTGRES_IMAGE_TAG}
+    image: 27-fpm-alpine
     volumes:
       - nextcloud-postgres:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: ${NEXTCLOUD_DB_NAME}
-      POSTGRES_USER: ${NEXTCLOUD_DB_USER}
-      POSTGRES_PASSWORD: ${NEXTCLOUD_DB_PASSWORD}
+   # environment:
+   #   POSTGRES_DB: ${NEXTCLOUD_DB_NAME}
+   #   POSTGRES_USER: ${NEXTCLOUD_DB_USER}
+   #   POSTGRES_PASSWORD: ${NEXTCLOUD_DB_PASSWORD}
     networks:
       - nextcloud-network
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "-d", "${NEXTCLOUD_DB_NAME}", "-U", "${NEXTCLOUD_DB_USER}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
     restart: unless-stopped
 
   redis:
-    image: ${NEXTCLOUD_REDIS_IMAGE_TAG}
-    command: ["redis-server", "--requirepass", "$NEXTCLOUD_REDIS_PASSWORD"]
+    image: redis:7.0
+    command: ["redis-server", "--requirepass", "redisBobby"]
     volumes:
       - redis-data:/data
     networks:
@@ -126,26 +114,25 @@ services:
     image: ${NEXTCLOUD_IMAGE_TAG}
     volumes:
       - nextcloud-data:/var/www/html
-    environment:
-      TZ: ${NEXTCLOUD_TIMEZONE}
-      POSTGRES_HOST: postgres
-      DB_PORT: 5432
-      POSTGRES_DB: ${NEXTCLOUD_DB_NAME}
-      POSTGRES_USER: ${NEXTCLOUD_DB_USER}
-      POSTGRES_PASSWORD: ${NEXTCLOUD_DB_PASSWORD}
-      REDIS_HOST: redis
-      REDIS_HOST_PORT: 6379
-      REDIS_HOST_PASSWORD: ${NEXTCLOUD_REDIS_PASSWORD}
-      NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USERNAME}
-      NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
-      NEXTCLOUD_TRUSTED_DOMAINS: ${NEXTCLOUD_HOSTNAME}
-      TRUSTED_PROXIES: ${NEXTCLOUD_HOSTNAME}
-      OVERWRITECLIURL: ${NEXTCLOUD_URL}
-      OVERWRITEPROTOCOL: https
-      OVERWRITEHOST: ${NEXTCLOUD_HOSTNAME}
+ #   environment:
+ #     TZ: ${NEXTCLOUD_TIMEZONE}
+ #     POSTGRES_HOST: postgres
+ #     DB_PORT: 5432
+ #     POSTGRES_DB: ${NEXTCLOUD_DB_NAME}
+ #     POSTGRES_USER: ${NEXTCLOUD_DB_USER}
+ #     POSTGRES_PASSWORD: ${NEXTCLOUD_DB_PASSWORD}
+ #     REDIS_HOST: redis
+ #     REDIS_HOST_PORT: 6379
+ #     REDIS_HOST_PASSWORD: ${NEXTCLOUD_REDIS_PASSWORD}
+ #     NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USERNAME}
+ #     NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
+ #     NEXTCLOUD_TRUSTED_DOMAINS: ${NEXTCLOUD_HOSTNAME}
+ #     TRUSTED_PROXIES: ${NEXTCLOUD_HOSTNAME}
+ #     OVERWRITECLIURL: ${NEXTCLOUD_URL}
+ #     OVERWRITEPROTOCOL: https
+ #     OVERWRITEHOST: ${NEXTCLOUD_HOSTNAME}
     networks:
       - nextcloud-network
-      - traefik-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/"]
       interval: 10s
