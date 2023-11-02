@@ -84,7 +84,7 @@ volumes:
 
 services:
   postgres:
-    image: 27-fpm-alpine
+    image: postgres:13
     volumes:
       - nextcloud-postgres:/var/lib/postgresql/data
    # environment:
@@ -111,7 +111,7 @@ services:
     restart: unless-stopped
 
   nextcloud:
-    image: ${NEXTCLOUD_IMAGE_TAG}
+    image: nextcloud:27-fpm-alpine
     volumes:
       - nextcloud-data:/var/www/html
  #   environment:
