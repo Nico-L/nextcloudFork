@@ -125,7 +125,7 @@ services:
   nextcloud:
     image: ${NEXTCLOUD_IMAGE_TAG}
     volumes:
-      - nextcloud-data:${DATA_PATH}
+      - nextcloud-data:/var/www/html
     environment:
       TZ: ${NEXTCLOUD_TIMEZONE}
       POSTGRES_HOST: postgres
